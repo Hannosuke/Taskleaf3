@@ -11,6 +11,11 @@ class TasksController < ApplicationController
    @task = Task.new
   end
 
+  def confirm_new
+    @task = current_user.tasks.new(task_params)
+    render :new unless @task.valid?
+  end
+
   def edit
   end
 
@@ -20,10 +25,15 @@ class TasksController < ApplicationController
   end
 
   def create
-    @task = current_user.task.new(task_params)
+    @task = current_user.tasks.new(task_params)
+
+    if params[:back].present?
+      render :new
+      return
+    end
 
     if @task.save
-      redirect_to @task, notice: "タスク「#{task.name}」を登録しました。"
+      redirect_to tasks_path, notice: "タスク「#{@task.name}」を登録しました。"
     else
       render :new
     end
@@ -32,7 +42,7 @@ class TasksController < ApplicationController
 
   def destroy
     @task.destroy
-    redirect_to tasks_url, notice: "タスク「#{task.name}」を削除しました。"
+    redirect_to tasks_url, notice: "タスク「#{@task.name}」を削除しました。"
   end
 
   private
