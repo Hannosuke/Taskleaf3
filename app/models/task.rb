@@ -12,6 +12,14 @@ class Task < ApplicationRecord
         end
     end
 
+    def self.import(file)
+        CSV.foreach(file.path, headers: true) do |row|
+            task = new
+            task.attiributes = row.to_hash.slice(csv_attributes)
+            task.save!
+        end
+    end
+
     has_one_attached :image
 
     def self.ransackable_attributes(auth_object = nil)
